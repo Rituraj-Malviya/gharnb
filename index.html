@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghar Notebook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#43e97b">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --accent: #FF9800;
+            --bg: #e0f7fa;
+            --bg-gradient: linear-gradient(135deg, #e0f7fa 0%, #f7f7f7 100%);
+            --card: #fff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.07);
+            --header-gradient: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            --text: #222;
+            --section-expenses: #388e3c;
+            --section-shopping: #ff9800;
+            --section-medicines: #2196f3;
+            --section-income: #9c27b0;
+            --section-loans: #d32f2f;
+            --section-notes: #607d8b;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #43e97b;
+                --primary-dark: #43e97b;
+                --accent: #ffb74d;
+                --bg: #181c1f;
+                --bg-gradient: linear-gradient(135deg, #23272b 0%, #181c1f 100%);
+                --card: #23272b;
+                --shadow: 0 2px 16px rgba(67,233,123,0.10);
+                --header-gradient: linear-gradient(90deg, #23272b 0%, #43e97b 100%);
+                --text: #f7f7f7;
+                --section-expenses: #43e97b;
+                --section-shopping: #ffb74d;
+                --section-medicines: #64b5f6;
+                --section-income: #ce93d8;
+                --section-loans: #ef5350;
+                --section-notes: #90a4ae;
+            }
+        }
+        body.dark-mode {
+            --primary: #43e97b;
+            --primary-dark: #43e97b;
+            --accent: #ffb74d;
+            --bg: #181c1f;
+            --bg-gradient: linear-gradient(135deg, #23272b 0%, #181c1f 100%);
+            --card: #23272b;
+            --shadow: 0 2px 16px rgba(67,233,123,0.10);
+            --header-gradient: linear-gradient(90deg, #23272b 0%, #43e97b 100%);
+            --text: #f7f7f7;
+            --section-expenses: #43e97b;
+            --section-shopping: #ffb74d;
+            --section-medicines: #64b5f6;
+            --section-income: #ce93d8;
+            --section-loans: #ef5350;
+            --section-notes: #90a4ae;
+        }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        header {
+            background: var(--header-gradient);
+            color: #fff;
+            padding: 2.2rem 1rem 1.2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(67,233,123,0.08);
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            position: relative;
+        }
+        .dark-toggle {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            background: rgba(255,255,255,0.12);
+            border: none;
+            border-radius: 2rem;
+            color: #fff;
+            font-size: 1.3rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+        .dark-toggle:hover {
+            background: rgba(255,255,255,0.22);
+        }
+        nav {
+            display: flex;
+            background: var(--card);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            justify-content: center;
+            flex-wrap: wrap;
+            border-radius: 0 0 1.2rem 1.2rem;
+        }
+        nav button {
+            flex: 1 1 120px;
+            padding: 1rem;
+            background: none;
+            color: var(--primary-dark);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            border-bottom: 3px solid transparent;
+            border-radius: 0 0 1rem 1rem;
+        }
+        nav button.active, nav button:hover {
+            background: var(--primary);
+            color: #fff;
+            border-bottom: 3px solid var(--accent);
+            box-shadow: 0 2px 8px rgba(67,233,123,0.08);
+        }
+        .container {
+            max-width: 700px;
+            margin: 2.2rem auto;
+            padding: 1.7rem 1.2rem;
+            background: var(--card);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 24px rgba(67,233,123,0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s, background 0.3s;
+            position: relative;
+        }
+        .section { display: none; margin-bottom: 2.5rem; }
+        .section.active { display: block; animation: fadeIn 0.5s; }
+        .section h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.1rem;
+            color: var(--section-expenses);
+            letter-spacing: 0.5px;
+        }
+        .section#section-expenses h2 { color: var(--section-expenses); }
+        .section#section-shopping h2 { color: var(--section-shopping); }
+        .section#section-medicines h2 { color: var(--section-medicines); }
+        .section#section-income h2 { color: var(--section-income); }
+        .section#section-loans h2 { color: var(--section-loans); }
+        .section#section-notes h2 { color: var(--section-notes); }
+        .section h2 .fa-solid { font-size: 1.1em; opacity: 0.85; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 800px) {
+            .container { margin: 1rem; padding: 1rem; }
+            nav button { font-size: 1rem; padding: 0.7rem; }
+            .mini-calc-container { max-width: 100%; }
+            .mini-calc-btn { font-size: 1.2rem; padding: 0.7rem 0; }
+            .mini-calc-display { font-size: 1.1rem; }
+        }
+        @media (max-width: 500px) {
+            header h1 { font-size: 1.3rem; }
+            .container { padding: 0.5rem; }
+            nav { flex-direction: column; }
+            nav button { border-bottom: none; border-left: 4px solid transparent; }
+            nav button.active, nav button:hover { border-left: 4px solid var(--accent); }
+            .mini-calc-container { padding: 0.7rem; }
+            .mini-calc-btn { font-size: 1.3rem; padding: 0.9rem 0; }
+            .mini-calc-display { font-size: 1rem; padding: 0.4rem 0.5rem; }
+            .entry-form input, .entry-form select { font-size: 1rem; padding: 0.6rem; }
+            .entry-form button { font-size: 1.1rem; padding: 0.7rem 1.2rem; }
+            .entry-list li { font-size: 0.98rem; padding: 0.6rem 0.7rem; }
+            #expensePieChart { max-width: 100%; }
+        }
+        @media (max-width: 370px) {
+            .mini-calc-btn { font-size: 1rem; padding: 0.7rem 0; }
+            .mini-calc-display { font-size: 0.95rem; }
+        }
+        .container, .mini-calc-container, .entry-form, .entry-list, .section {
+            box-sizing: border-box;
+        }
+        .mini-calc-container { width: 100%; overflow-x: auto; }
+        #expensePieChart { width: 100% !important; max-width: 100%; height: auto !important; display: block; margin: 0 auto; }
+        .entry-form input, .entry-form select, .entry-form button {
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .entry-form { gap: 0.7rem; }
+        .entry-list li {
+            background: linear-gradient(90deg, #f1f8e9 0%, #f1f1f1 100%);
+            margin-bottom: 0.5rem;
+            padding: 0.7rem 1rem;
+            border-radius: 0.7rem;
+            box-shadow: 0 1px 3px rgba(67,233,123,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+        .entry-list li:hover {
+            box-shadow: 0 4px 12px rgba(67,233,123,0.10);
+            background: linear-gradient(90deg, #e0f7fa 0%, #f1f8e9 100%);
+        }
+        .delete-btn { background: none; border: none; color: #d32f2f; font-size: 1.2em; cursor: pointer; margin-left: 0.5em; transition: color 0.2s; }
+        .delete-btn:hover { color: #b71c1c; }
+        .mini-calc-container {
+            margin-top: 1.5rem;
+            background: linear-gradient(90deg, #f9fbe7 0%, #e0f7fa 100%);
+            border-radius: 0.7rem;
+            box-shadow: 0 1px 3px rgba(67,233,123,0.04);
+            padding: 1rem;
+            max-width: 340px;
+            border: 1px solid #e0e0e0;
+        }
+        .mini-calc-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #607d8b;
+        }
+        .mini-calc-display {
+            background: #fff;
+            border: 1px solid #bbb;
+            border-radius: 0.4rem;
+            font-size: 1.2rem;
+            padding: 0.5rem 0.7rem;
+            margin-bottom: 0.5rem;
+            min-height: 1.7em;
+            word-break: break-all;
+        }
+        .mini-calc-pad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .mini-calc-btn {
+            padding: 0.6rem 0;
+            border: none;
+            background: #4caf50;
+            color: #fff;
+            border-radius: 0.4rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .mini-calc-btn.op { background: #ff9800; }
+        .mini-calc-btn.eq { background: #388e3c; }
+        .mini-calc-btn.clr { background: #d32f2f; }
+        .mini-calc-btn.bk { background: #607d8b; }
+        .mini-calc-btn:hover { filter: brightness(0.95); }
+        .mini-calc-result {
+            font-size: 1.1rem;
+            color: #388e3c;
+            font-weight: bold;
+            margin-top: 0.3rem;
+            min-height: 1.2em;
+        }
+        .loan-reminder {
+            background: linear-gradient(90deg, #fff3e0 0%, #ffe0e0 100%);
+            border-left:5px solid #d32f2f;
+            padding:0.7em 1em;
+            margin-bottom:0.5em;
+            border-radius:0.7em;
+            box-shadow: 0 2px 8px rgba(211,47,47,0.07);
+        }
+        .medicine-reminder {
+            background: linear-gradient(90deg, #e3f2fd 0%, #e8f5e9 100%);
+            border-left: 5px solid #2196f3;
+            padding: 0.7em 1em;
+            margin-bottom: 0.5em;
+            border-radius: 0.7em;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            color: #1565c0;
+            font-weight: bold;
+        }
+        .medicine-due {
+            background: linear-gradient(90deg, #fffde7 0%, #ffe0b2 100%) !important;
+            border-left: 5px solid #ff9800 !important;
+            color: #e65100 !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ghar Notebook</h1>
+        <button class="dark-toggle" id="darkToggle" title="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+        <p>Family Expense & Life Tracker</p>
+    </header>
+    <nav>
+        <button id="tab-expenses" class="active">Expenses</button>
+        <button id="tab-shopping">Shopping List</button>
+        <button id="tab-medicines">Medicines</button>
+        <button id="tab-income">Income</button>
+        <button id="tab-loans">Loans</button>
+        <button id="tab-notes">Notes</button>
+    </nav>
+    <div class="container">
+        <div id="section-expenses" class="section active">
+            <h2><i class="fa-solid fa-receipt"></i> Expenses</h2>
+            <form id="form-expense" class="entry-form">
+                <input type="date" name="date" required>
+                <input type="text" name="category" placeholder="Category" required>
+                <input type="text" name="description" placeholder="Description" required>
+                <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+                <button type="submit">Add Expense</button>
+            </form>
+            <ul id="list-expenses" class="entry-list"></ul>
+            <div class="mini-calc-container"></div>
+        </div>
+        <div id="section-shopping" class="section">
+            <h2><i class="fa-solid fa-cart-shopping"></i> Shopping List</h2>
+            <form id="form-shopping" class="entry-form">
+                <input type="text" name="item" placeholder="Item" required>
+                <input type="text" name="quantity" placeholder="Quantity" required>
+                <button type="submit">Add Item</button>
+            </form>
+            <ul id="list-shopping" class="entry-list"></ul>
+            <div class="mini-calc-container"></div>
+        </div>
+        <div id="section-medicines" class="section">
+            <h2><i class="fa-solid fa-capsules"></i> Medicines</h2>
+            <form id="form-medicines" class="entry-form">
+                <input type="text" name="name" placeholder="Medicine Name" required>
+                <input type="text" name="quantity" placeholder="Quantity" required>
+                <input type="time" name="reminder_time" required>
+                <button type="submit">Add Medicine</button>
+            </form>
+            <div id="medicine-reminders"></div>
+            <ul id="list-medicines" class="entry-list"></ul>
+        </div>
+        <div id="section-income" class="section">
+            <h2><i class="fa-solid fa-wallet"></i> Income</h2>
+            <form id="form-income" class="entry-form">
+                <input type="date" name="date" required>
+                <input type="text" name="source" placeholder="Source" required>
+                <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+                <button type="submit">Add Income</button>
+            </form>
+            <ul id="list-income" class="entry-list"></ul>
+            <div style="margin-top:2rem;">
+                <h3>Expense Breakdown</h3>
+                <canvas id="expensePieChart" width="400" height="300"></canvas>
+            </div>
+            <div class="mini-calc-container"></div>
+        </div>
+        <div id="section-loans" class="section">
+            <h2><i class="fa-solid fa-hand-holding-dollar"></i> Loans</h2>
+            <form id="form-loans" class="entry-form">
+                <input type="date" name="date" required>
+                <input type="text" name="person" placeholder="Person" required>
+                <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+                <select name="type" required>
+                    <option value="lent">Lent</option>
+                    <option value="borrowed">Borrowed</option>
+                </select>
+                <input type="date" name="due_date" placeholder="Due Date" required>
+                <button type="submit">Add Loan</button>
+            </form>
+            <div id="loan-reminders"></div>
+            <ul id="list-loans" class="entry-list"></ul>
+            <div class="mini-calc-container"></div>
+        </div>
+        <div id="section-notes" class="section">
+            <h2><i class="fa-solid fa-note-sticky"></i> Notes</h2>
+            <form id="form-notes" class="entry-form">
+                <input type="text" name="content" placeholder="Write a note..." required style="width:70%">
+                <button type="submit">Add Note</button>
+            </form>
+            <ul id="list-notes" class="entry-list"></ul>
+        </div>
+    </div>
+    <script>
+        // Tab navigation logic
+        const tabs = [
+            { btn: 'tab-expenses', section: 'section-expenses' },
+            { btn: 'tab-shopping', section: 'section-shopping' },
+            { btn: 'tab-medicines', section: 'section-medicines' },
+            { btn: 'tab-income', section: 'section-income' },
+            { btn: 'tab-loans', section: 'section-loans' },
+            { btn: 'tab-notes', section: 'section-notes' },
+        ];
+        tabs.forEach(({ btn, section }) => {
+            document.getElementById(btn).onclick = () => {
+                tabs.forEach(({ btn: b, section: s }) => {
+                    document.getElementById(b).classList.remove('active');
+                    document.getElementById(s).classList.remove('active');
+                });
+                document.getElementById(btn).classList.add('active');
+                document.getElementById(section).classList.add('active');
+            };
+        });
+
+        // --- API base URL ---
+        const API = 'http://127.0.0.1:5000/api';
+
+        let expensesCache = [];
+        let incomeCache = [];
+        let loansCache = [];
+        let pieChart = null;
+
+        // --- Helper: Render List with Delete ---
+        function renderList(listId, items, renderFn, deleteFn) {
+            const ul = document.getElementById(listId);
+            ul.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = renderFn(item) +
+                    ` <button class="delete-btn" title="Delete">🗑️</button>`;
+                li.querySelector('.delete-btn').onclick = () => deleteFn(item.id);
+                ul.appendChild(li);
+            });
+        }
+
+        // --- Pie Chart ---
+        function updatePieChart() {
+            // Calculate total income
+            const totalIncome = incomeCache.reduce((sum, i) => sum + Number(i.amount), 0);
+            // Calculate total spent per category
+            const categoryTotals = {};
+            expensesCache.forEach(e => {
+                if (!categoryTotals[e.category]) categoryTotals[e.category] = 0;
+                categoryTotals[e.category] += Number(e.amount);
+            });
+            // Add loans as special categories
+            let loanLent = 0, loanRepayment = 0;
+            loansCache.forEach(l => {
+                if (l.type === 'lent') loanLent += Number(l.amount);
+                if (l.type === 'borrowed') loanRepayment += Number(l.amount);
+            });
+            if (loanLent > 0) categoryTotals['Loan Lent'] = loanLent;
+            if (loanRepayment > 0) categoryTotals['Loan Repayment'] = loanRepayment;
+            const categories = Object.keys(categoryTotals);
+            const data = categories.map(cat => categoryTotals[cat]);
+            // Colors for chart
+            const colors = [
+                '#4CAF50', '#FF9800', '#2196F3', '#E91E63', '#9C27B0', '#FFC107', '#009688', '#F44336', '#607D8B', '#795548'
+            ];
+            // Destroy previous chart if exists
+            if (pieChart) pieChart.destroy();
+            const ctx = document.getElementById('expensePieChart').getContext('2d');
+            pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: categories.length ? categories : ['No Expenses'],
+                    datasets: [{
+                        data: data.length ? data : [1],
+                        backgroundColor: colors,
+                        label: 'Expenses by Category'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (!totalIncome) return context.label + ': ₹' + context.parsed;
+                                    const percent = ((context.parsed / totalIncome) * 100).toFixed(1);
+                                    return `${context.label}: ₹${context.parsed} (${percent}% of income)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Expenses ---
+        async function loadExpenses() {
+            const res = await fetch(`${API}/expenses`);
+            const data = await res.json();
+            expensesCache = data;
+            renderList('list-expenses', data,
+                e => `<b>${e.date}</b> [${e.category}] ${e.description} - <span style='color:var(--primary-dark)'><b>₹${e.amount}</b></span>`,
+                async id => {
+                    await fetch(`${API}/expenses/${id}`, { method: 'DELETE' });
+                    loadExpenses();
+                    updatePieChart();
+                }
+            );
+            updatePieChart();
+        }
+        document.getElementById('form-expense').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            obj.amount = parseFloat(obj.amount);
+            await fetch(`${API}/expenses`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadExpenses();
+            updatePieChart();
+        };
+
+        // --- Shopping ---
+        async function loadShopping() {
+            const res = await fetch(`${API}/shopping`);
+            const data = await res.json();
+            renderList('list-shopping', data,
+                s => `${s.item} (${s.quantity})${s.purchased ? ' <span style=\"color:green\">✔</span>' : ''}`,
+                async id => {
+                    await fetch(`${API}/shopping/${id}`, { method: 'DELETE' });
+                    loadShopping();
+                }
+            );
+        }
+        document.getElementById('form-shopping').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            await fetch(`${API}/shopping`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadShopping();
+        };
+
+        // --- Medicines ---
+        async function loadMedicines() {
+            const res = await fetch(`${API}/medicines`);
+            const data = await res.json();
+            showMedicineReminders(data);
+            renderList('list-medicines', data,
+                m => `<span${isMedicineDue(m.reminder_time) ? ' class="medicine-due"' : ''}>${m.name} (${m.quantity}) <span style='color:#888'>[Time: ${m.reminder_time || 'N/A'}]</span>${isMedicineDue(m.reminder_time) ? ' <b>⏰ Due!</b>' : ''}</span>`,
+                async id => {
+                    await fetch(`${API}/medicines/${id}`, { method: 'DELETE' });
+                    loadMedicines();
+                }
+            );
+        }
+        function isMedicineDue(reminderTime) {
+            if (!reminderTime) return false;
+            const now = new Date();
+            const [h, m] = reminderTime.split(":");
+            return now.getHours() === parseInt(h) && Math.abs(now.getMinutes() - parseInt(m)) <= 2;
+        }
+        function showMedicineReminders(meds) {
+            const due = meds.filter(m => isMedicineDue(m.reminder_time));
+            const div = document.getElementById('medicine-reminders');
+            if (due.length === 0) { div.innerHTML = ''; return; }
+            div.innerHTML = due.map(m =>
+                `<div class='medicine-reminder medicine-due'>
+                    <b>Time to take:</b> ${m.name} (${m.quantity}) <span style='font-size:0.95em'>[${m.reminder_time}]</span>
+                </div>`
+            ).join('');
+        }
+        // Poll every minute for medicine reminders
+        setInterval(() => {
+            if (document.getElementById('section-medicines').classList.contains('active')) loadMedicines();
+        }, 60000);
+        document.getElementById('form-medicines').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            await fetch(`${API}/medicines`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadMedicines();
+        };
+
+        // --- Income ---
+        async function loadIncome() {
+            const res = await fetch(`${API}/income`);
+            const data = await res.json();
+            incomeCache = data;
+            renderList('list-income', data,
+                i => `<b>${i.date}</b> [${i.source}] <span style='color:var(--primary-dark)'><b>₹${i.amount}</b></span>`,
+                async id => {
+                    await fetch(`${API}/income/${id}`, { method: 'DELETE' });
+                    loadIncome();
+                    updatePieChart();
+                }
+            );
+            updatePieChart();
+        }
+        document.getElementById('form-income').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            obj.amount = parseFloat(obj.amount);
+            await fetch(`${API}/income`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadIncome();
+            updatePieChart();
+        };
+
+        // --- Loans ---
+        async function loadLoans() {
+            const res = await fetch(`${API}/loans`);
+            const data = await res.json();
+            loansCache = data;
+            showLoanReminders(data);
+            renderList('list-loans', data,
+                l => `<b>${l.date}</b> [${l.type}] ${l.person} - <span style='color:var(--primary-dark)'><b>₹${l.amount}</b></span> <span style='color:#888;font-size:0.95em'>[Due: ${l.due_date || 'N/A'}]</span>` +
+                    (isLoanOverdue(l.due_date) ? " <span style='color:#d32f2f;font-weight:bold'>(Overdue!)</span>" : ""),
+                async id => {
+                    await fetch(`${API}/loans/${id}`, { method: 'DELETE' });
+                    loadLoans();
+                    updatePieChart();
+                }
+            );
+            updatePieChart();
+        }
+        function isLoanOverdue(dueDate) {
+            if (!dueDate) return false;
+            const today = new Date().toISOString().slice(0, 10);
+            return dueDate < today;
+        }
+        function isLoanDueToday(dueDate) {
+            if (!dueDate) return false;
+            const today = new Date().toISOString().slice(0, 10);
+            return dueDate === today;
+        }
+        function showLoanReminders(loans) {
+            const reminders = loans.filter(l => isLoanDueToday(l.due_date) || isLoanOverdue(l.due_date));
+            const div = document.getElementById('loan-reminders');
+            if (reminders.length === 0) { div.innerHTML = ''; return; }
+            div.innerHTML = reminders.map(l =>
+                `<div class='loan-reminder' style='background:#fff3e0;border-left:5px solid #d32f2f;padding:0.7em 1em;margin-bottom:0.5em;border-radius:0.5em;'>
+                    <b>Loan ${l.type === 'lent' ? 'to' : 'from'} ${l.person}</b> of <b>₹${l.amount}</b> is <span style='color:#d32f2f'>${isLoanOverdue(l.due_date) ? 'OVERDUE' : 'due today'}</span> (Due: ${l.due_date})
+                </div>`
+            ).join('');
+        }
+        document.getElementById('form-loans').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            obj.amount = parseFloat(obj.amount);
+            await fetch(`${API}/loans`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadLoans();
+            updatePieChart();
+        };
+
+        // --- Notes ---
+        async function loadNotes() {
+            const res = await fetch(`${API}/notes`);
+            const data = await res.json();
+            renderList('list-notes', data,
+                n => `${n.content} <span style='color:#888;font-size:0.9em'>[${n.created_at}]</span>`,
+                async id => {
+                    await fetch(`${API}/notes/${id}`, { method: 'DELETE' });
+                    loadNotes();
+                }
+            );
+        }
+        document.getElementById('form-notes').onsubmit = async e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const obj = Object.fromEntries(fd.entries());
+            obj.created_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            await fetch(`${API}/notes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(obj)
+            });
+            e.target.reset();
+            loadNotes();
+        };
+
+        // --- Advanced Mini Calculator Widget ---
+        function createMiniCalculator(container) {
+            container.innerHTML = `
+                <div class="mini-calc-title">Mini Calculator</div>
+                <div class="mini-calc-display"></div>
+                <div class="mini-calc-pad">
+                    <button class="mini-calc-btn clr" title="Clear">C</button>
+                    <button class="mini-calc-btn bk" title="Backspace">⌫</button>
+                    <button class="mini-calc-btn op" data-val="(" title="(">(</button>
+                    <button class="mini-calc-btn op" data-val=")" title=")">)</button>
+                    <button class="mini-calc-btn" data-val="7">7</button>
+                    <button class="mini-calc-btn" data-val="8">8</button>
+                    <button class="mini-calc-btn" data-val="9">9</button>
+                    <button class="mini-calc-btn op" data-val="/">÷</button>
+                    <button class="mini-calc-btn" data-val="4">4</button>
+                    <button class="mini-calc-btn" data-val="5">5</button>
+                    <button class="mini-calc-btn" data-val="6">6</button>
+                    <button class="mini-calc-btn op" data-val="*">×</button>
+                    <button class="mini-calc-btn" data-val="1">1</button>
+                    <button class="mini-calc-btn" data-val="2">2</button>
+                    <button class="mini-calc-btn" data-val="3">3</button>
+                    <button class="mini-calc-btn op" data-val="-">-</button>
+                    <button class="mini-calc-btn" data-val="0">0</button>
+                    <button class="mini-calc-btn" data-val=".">.</button>
+                    <button class="mini-calc-btn eq" title="Equals">=</button>
+                    <button class="mini-calc-btn op" data-val="+">+</button>
+                </div>
+                <div class="mini-calc-result"></div>
+            `;
+            const display = container.querySelector('.mini-calc-display');
+            const result = container.querySelector('.mini-calc-result');
+            let expr = '';
+            function updateDisplay() {
+                display.textContent = expr || '0';
+            }
+            function evaluate() {
+                try {
+                    if (!expr.trim()) return;
+                    // Only allow numbers and operators
+                    if (!/^[-+*/().\d\s]+$/.test(expr)) throw new Error('Invalid input');
+                    // eslint-disable-next-line no-eval
+                    const val = eval(expr);
+                    result.textContent = '= ' + val;
+                } catch {
+                    result.textContent = 'Invalid expression';
+                }
+            }
+            container.querySelectorAll('.mini-calc-btn').forEach(btn => {
+                if (btn.classList.contains('eq')) {
+                    btn.onclick = evaluate;
+                } else if (btn.classList.contains('clr')) {
+                    btn.onclick = () => { expr = ''; updateDisplay(); result.textContent = ''; };
+                } else if (btn.classList.contains('bk')) {
+                    btn.onclick = () => { expr = expr.slice(0, -1); updateDisplay(); result.textContent = ''; };
+                } else if (btn.dataset.val) {
+                    btn.onclick = () => { expr += btn.dataset.val; updateDisplay(); result.textContent = ''; };
+                }
+            });
+            // Keyboard support
+            container.tabIndex = 0;
+            container.onkeydown = e => {
+                if ((e.key >= '0' && e.key <= '9') || '+-*/().'.includes(e.key)) {
+                    expr += e.key;
+                    updateDisplay();
+                    result.textContent = '';
+                } else if (e.key === 'Backspace') {
+                    expr = expr.slice(0, -1);
+                    updateDisplay();
+                    result.textContent = '';
+                } else if (e.key === 'Enter' || e.key === '=') {
+                    evaluate();
+                } else if (e.key === 'c' || e.key === 'C') {
+                    expr = '';
+                    updateDisplay();
+                    result.textContent = '';
+                }
+            };
+            updateDisplay();
+        }
+        document.querySelectorAll('.mini-calc-container').forEach(createMiniCalculator);
+
+        // --- Register Service Worker for PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js');
+            });
+        }
+
+        // --- Dark Mode Toggle ---
+        const darkToggle = document.getElementById('darkToggle');
+        function setDarkMode(on) {
+            document.body.classList.toggle('dark-mode', on);
+            localStorage.setItem('darkMode', on ? '1' : '0');
+            darkToggle.innerHTML = on ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        }
+        // Auto-detect system preference on first load
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedDark = localStorage.getItem('darkMode');
+        setDarkMode(savedDark === null ? prefersDark : savedDark === '1');
+        darkToggle.onclick = () => setDarkMode(!document.body.classList.contains('dark-mode'));
+
+        // --- Initial load ---
+        loadExpenses();
+        loadShopping();
+        loadMedicines();
+        loadIncome();
+        loadLoans();
+        loadNotes();
+    </script>
+</body>
+</html> 
